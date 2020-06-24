@@ -12,8 +12,11 @@ const PickedWord = ({wordCripted, word, help, letter})=>(
         </h1>
         <hr />
         <br />
-        <InfoCircle />
-            { help}
+        
+            <h5>
+                <InfoCircle />
+                {help}
+            </h5>
     </div>
     
 )
