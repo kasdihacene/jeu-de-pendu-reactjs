@@ -1,6 +1,7 @@
 import React from 'react';
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Container from 'react-bootstrap/Container'
+import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 import shuffle from 'lodash.shuffle'
@@ -13,9 +14,11 @@ const UNKNOWN_LETTER = '❓';
 const WORDS2 = ["REACTJS", "BOOTSTRAP", "UI", "DEVELOPPEUR","DOM","VIRTUAL"]
 const WORDS = {
     "BOOTSTRAP":" Un Framework pour le developpement des interfaces graphiques.",
-    //"DOM VIRTUEL":" ReactJS utilise _____ pour augmenter les performances.",
-    //"MODULES":" React est basé sur les _______.",
-    "DEVELOPPEUR":" La personne qui écrit du code."}
+    "UI":" user interface.",
+    "DOM VIRTUEL":" ReactJS utilise _____ pour augmenter les performances.",
+    "MODULES":" React est basé sur les _______.",
+    "DEVELOPPEUR":" La personne qui écrit du code."
+}
 class Board extends React.Component{
     
     generateButtons(){
@@ -38,8 +41,8 @@ class Board extends React.Component{
     state = {
         buttons: this.generateButtons(),
         pickedWord: this.pickWord(),
-        updatedWord:'',
-        currentLetter: '',
+        triedLetters:'',
+        currentState: '',
         attempts: 0
     }
 
@@ -52,17 +55,32 @@ class Board extends React.Component{
     // Arrow fx for binding - else the state will be undefined
     handleClick = letter => {
 
-        const {pickedWord, updatedWord, attempts} = this.state
+        const {pickedWord, triedLetters, attempts} = this.state
         const newAttempts = attempts + 1
-        let updated = updatedWord.concat(letter)
-        let progressResult = this.computeDisplay(pickedWord,updated)
-        this.setState({updatedWord: updated, attempts: newAttempts })
+        let updated = triedLetters.concat(letter)
+        this.setState({triedLetters: updated, attempts: newAttempts })
         
+        this.isGameCompleted(pickedWord,updated)
+    }
+    
+    isGameCompleted(word, letters){
+        let progressResult = this.computeDisplay(word,letters)
         console.log(progressResult)
+        this.setState({currentState: progressResult })
+
+    }
+
+    resetState = () =>{
+         this.setState({
+            pickedWord: this.pickWord(),
+            triedLetters:'',
+            currentState: '',
+            attempts: 0
+         })
     }
 
     render(){
-        const {buttons, pickedWord, updatedWord,currentLetter, attempts} = this.state
+        const {buttons, pickedWord,triedLetters,currentState, attempts} = this.state
 
         return (
             <Container>
@@ -77,16 +95,13 @@ class Board extends React.Component{
                     
                     {
                         <PickedWord 
-                        wordCripted={this.computeDisplay(pickedWord,updatedWord)} 
-                        word={pickedWord} 
+                        wordCripted={this.computeDisplay(pickedWord,triedLetters)} 
                         help={WORDS[pickedWord]} 
-                        letter={currentLetter}
                         />
                     }
 
                     <br />
                     <div className="row d-flex justify-content-center">
-
                     {
                         buttons.map((card,index)=>(
                             <Card
@@ -98,6 +113,10 @@ class Board extends React.Component{
                             ))
                         }
                     </div>
+                    {
+                        pickedWord === currentState ? 
+                        <Button variant="outline-success" size="lg" onClick={this.resetState} > Recommencer </Button> : ''
+                    }
                 </Jumbotron>
             </Container>
 
